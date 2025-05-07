@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Potency Interactive Graph (Log Scale)</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <h3>Interactive Potency Graph (Log X-Axis)</h3>
+  <label for="ec50">EC50 (Potency):</label>
+  <input type="range" id="ec50" min="1" max="100" value="10" />
+  <span id="ec50-value">10</span>
+  <div id="plot"></div>
+
+  <script>
+    function updatePlot(ec50) {
+      // สร้าง log-scale X axis: ใช้ค่าระหว่าง 1 ถึง 100 แบบ logarithmic
+      let D = Array.from({ length: 100 }, (_, i) => Math.pow(10, i * 0.02)); // ~1 ถึง 100
+      let E = D.map(d => (100 * d) / (parseFloat(ec50) + d));
+
+      Plotly.newPlot('plot', [{
+        x: D,
+        y: E,
+        mode: 'lines',
+        name: 'Dose-Response Curve'
+      }], {
+        title: 'Dose-Response Curve (Log X-Axis)',
+        xaxis: {
+          title: 'Drug Concentration (log scale)',
+          type: 'log'
+        },
+        yaxis: {
+          title: 'Effect (%)'
+        }
+      });
+    }
+
+    const ec50Slider = document.getElementById('ec50');
+    const ec50Value = document.getElementById('ec50-value');
+
+    ec50Slider.addEventListener('input', function () {
+      ec50Value.textContent = this.value;
+      updatePlot(this.value);
+    });
+
+    updatePlot(ec50Slider.value); // initial plot
+  </script>
+</body>
+</html>
