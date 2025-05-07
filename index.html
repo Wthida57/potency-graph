@@ -17,24 +17,25 @@
       const D = Array.from({ length: 100 }, (_, i) => Math.pow(10, i * 0.02)); // 1–100 log scale
       const E = D.map(d => 100 * d / (parseFloat(ec50) + d)); // Emax = 100
 
-      Plotly.newPlot('plot', [{
-        x: D,
-        y: E,
-        mode: 'lines',
-        name: `EC50 = ${ec50}`
-      }], {
-        title: 'Dose-Response Curve with Log X-Axis',
-        xaxis: {
-          title: 'Drug Concentration (log scale)',
-          type: 'log',
-          range: [0, 2] // log10(1) to log10(100)
-        },
-        yaxis: {
-          title: 'Effect (%)',
-          range: [0, 110]
-        }
-      });
-    }
+Plotly.newPlot('plot', [{
+  x: D,
+  y: E,
+  mode: 'lines',
+  name: `EC50 = ${ec50}`
+}], {
+  title: 'Dose-Response Curve with Log X-Axis',
+  xaxis: {
+    title: 'Drug Concentration (log scale)',
+    type: 'log',
+    range: [0, 2], // log10(1) ถึง log10(100) → X คงที่
+    autorange: false // ✅ ต้องใส่เพื่อไม่ให้ Plotly ปรับอัตโนมัติ
+  },
+  yaxis: {
+    title: 'Effect (%)',
+    range: [0, 100], // ✅ Y คงที่
+    autorange: false
+  }
+});
 
     const ec50Slider = document.getElementById('ec50');
     const ec50Value = document.getElementById('ec50-value');
