@@ -2,50 +2,52 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Potency Interactive Graph (Log X-Axis)</title>
+  <title>Potency Curve (Log X-Axis)</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-  <h3>Potency and EC50 (Log X-Axis)</h3>
-  <label for="ec50">EC50 (lower = more potent):</label>
+  <h3>Interactive Potency Graph (Log X-Axis)</h3>
+  <label for="ec50">EC50 (Potency):</label>
   <input type="range" id="ec50" min="1" max="100" value="10" />
   <span id="ec50-value">10</span>
   <div id="plot"></div>
 
   <script>
-    function updatePlot(ec50) {
-      const D = Array.from({ length: 100 }, (_, i) => Math.pow(10, i * 0.02)); // 1–100 log scale
-      const E = D.map(d => 100 * d / (parseFloat(ec50) + d)); // Emax = 100
+    function updatePlot(ec50Raw) {
+      const ec50 = parseFloat(ec50Raw);
+      const D = Array.from({ length: 100 }, (_, i) => Math.pow(10, -1 + i * 0.03)); // 0.1 to 100 log scale
+      const E = D.map(d => 100 * d / (ec50 + d));
 
-Plotly.newPlot('plot', [{
-  x: D,
-  y: E,
-  mode: 'lines',
-  name: `EC50 = ${ec50}`
-}], {
-  title: 'Dose-Response Curve with Log X-Axis',
-  xaxis: {
-    title: 'Drug Concentration (log scale)',
-    type: 'log',
-    range: [0, 2], // log10(1) ถึง log10(100) → X คงที่
-    autorange: false // ✅ ต้องใส่เพื่อไม่ให้ Plotly ปรับอัตโนมัติ
-  },
-  yaxis: {
-    title: 'Effect (%)',
-    range: [0, 100], // ✅ Y คงที่
-    autorange: false
-  }
-});
+      Plotly.newPlot('plot', [{
+        x: D,
+        y: E,
+        mode: 'lines',
+        name: `EC50 = ${ec50}`
+      }], {
+        title: 'Dose-Response Curve (Log X-Axis)',
+        xaxis: {
+          title: 'Drug Concentration (log scale)',
+          type: 'log',
+          range: [-1, 2], // log10(0.1) to log10(100)
+          autorange: false
+        },
+        yaxis: {
+          title: 'Effect (%)',
+          range: [0, 110],
+          autorange: false
+        }
+      });
+    }
 
-    const ec50Slider = document.getElementById('ec50');
-    const ec50Value = document.getElementById('ec50-value');
+    const slider = document.getElementById('ec50');
+    const valueDisplay = document.getElementById('ec50-value');
 
-    ec50Slider.addEventListener('input', function () {
-      ec50Value.textContent = this.value;
+    slider.addEventListener('input', function () {
+      valueDisplay.textContent = this.value;
       updatePlot(this.value);
     });
 
-    updatePlot(ec50Slider.value); // initial render
+    updatePlot(slider.value); // initial plot
   </script>
 </body>
 </html>
